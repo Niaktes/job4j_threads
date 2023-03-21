@@ -7,25 +7,26 @@ public class Wget implements Runnable {
 
     private final String url;
     private final int speed;
+    private final String targetFileName;
 
-    public Wget(String url, int speed) {
+    public Wget(String url, int speed, String targetFileName) {
         this.url = url;
         this.speed = speed;
+        this.targetFileName = targetFileName;
     }
 
     @Override
     public void run() {
         try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-             FileOutputStream fileOutputStream = new FileOutputStream("temp")) {
+             FileOutputStream fileOutputStream = new FileOutputStream(targetFileName)) {
             byte[] dataBuffer = new byte[1024];
-            int bytesRead;
-            while (true) {
+            int bytesRead = 0;
+            while (bytesRead != -1) {
                 long start = System.currentTimeMillis();
                 bytesRead = in.read(dataBuffer, 0, 1024);
-                if (bytesRead == -1) {
-                    break;
+                if (bytesRead != -1) {
+                    fileOutputStream.write(dataBuffer, 0, bytesRead);
                 }
-                fileOutputStream.write(dataBuffer, 0, bytesRead);
                 long elapsedTime = System.currentTimeMillis() - start;
                 if (elapsedTime * speed < 1000) {
                     Thread.sleep(1000 - elapsedTime);
@@ -42,13 +43,14 @@ public class Wget implements Runnable {
         argumentsValidation(args);
         String url = args[0];
         int speed = Integer.parseInt(args[1]);
-        Thread wget = new Thread(new Wget(url, speed));
+        String fileName = args[2];
+        Thread wget = new Thread(new Wget(url, speed, fileName));
         wget.start();
         wget.join();
     }
 
     private static void argumentsValidation(String[] arguments) {
-        if (arguments.length != 2) {
+        if (arguments.length != 3) {
             throw new IllegalArgumentException("Wrong number of arguments! There must be only two arguments.");
         }
         if (arguments[0].isBlank() || !arguments[0].startsWith("https://")) {
@@ -59,6 +61,9 @@ public class Wget implements Runnable {
         }
         if (Integer.parseInt(arguments[1]) < 1 || Integer.parseInt(arguments[1]) > 10) {
             throw new IllegalArgumentException("Second argument is download speed and must be between 1 and 100 KBytes/s");
+        }
+        if (arguments[2].isBlank()) {
+            throw new IllegalArgumentException("You must specify the name of the target file!");
         }
     }
 
