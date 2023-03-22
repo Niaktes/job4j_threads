@@ -20,16 +20,20 @@ public class Wget implements Runnable {
         try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
              FileOutputStream fileOutputStream = new FileOutputStream(targetFileName)) {
             byte[] dataBuffer = new byte[1024];
-            int bytesRead = 0;
-            while (bytesRead != -1) {
-                long start = System.currentTimeMillis();
-                bytesRead = in.read(dataBuffer, 0, 1024);
-                if (bytesRead != -1) {
-                    fileOutputStream.write(dataBuffer, 0, bytesRead);
-                }
-                long elapsedTime = System.currentTimeMillis() - start;
-                if (elapsedTime * speed < 1000) {
-                    Thread.sleep(1000 - elapsedTime);
+            int bytesRead;
+            int downloadData = 0;
+            int speedInBytes = speed * 1048576;
+            long start = System.currentTimeMillis();
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                fileOutputStream.write(dataBuffer, 0, bytesRead);
+                downloadData += bytesRead;
+                if (downloadData >= speedInBytes) {
+                    long elapsedTime = System.currentTimeMillis() - start;
+                    if (elapsedTime < 1000){
+                        Thread.sleep(1000 - elapsedTime);
+                    }
+                    downloadData = 0;
+                    start = System.currentTimeMillis();
                 }
             }
         } catch (IOException e) {
@@ -57,10 +61,10 @@ public class Wget implements Runnable {
             throw new IllegalArgumentException("First argument must be \"https://\" address");
         }
         if (arguments[1].isBlank() || !arguments[1].chars().allMatch(Character::isDigit)) {
-            throw new IllegalArgumentException("Second argument must be numeric between 1 and 100");
+            throw new IllegalArgumentException("Second argument must be numeric between 1 and 10");
         }
         if (Integer.parseInt(arguments[1]) < 1 || Integer.parseInt(arguments[1]) > 10) {
-            throw new IllegalArgumentException("Second argument is download speed and must be between 1 and 100 KBytes/s");
+            throw new IllegalArgumentException("Second argument is download speed and must be between 1 and 10 MBytes/s");
         }
         if (arguments[2].isBlank()) {
             throw new IllegalArgumentException("You must specify the name of the target file!");
