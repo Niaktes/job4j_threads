@@ -31,14 +31,14 @@ public class AccountStorage {
     }
 
     public synchronized boolean transfer(int fromId, int toId, int amount) {
-        boolean done = accounts.containsKey(fromId)
-                && accounts.containsKey(toId)
-                && accounts.get(fromId).amount() >= amount;
+        Optional<Account> possibleFrom = getById(fromId);
+        Optional<Account> possibleTo = getById(toId);
+        boolean done = possibleFrom.isPresent() && possibleTo.isPresent() && possibleFrom.get().amount() >= amount;
         if (done) {
-            Account from = accounts.get(fromId);
-            Account to = accounts.get(toId);
-            accounts.put(fromId, new Account(fromId, from.amount() - amount));
-            accounts.put(toId, new Account(toId, to.amount() + amount));
+            Account from = possibleFrom.get();
+            Account to = possibleTo.get();
+            accounts.put(from.id(), new Account(from.id(), from.amount() - amount));
+            accounts.put(to.id(), new Account(to.id(), to.amount() + amount));
         }
         return done;
     }
