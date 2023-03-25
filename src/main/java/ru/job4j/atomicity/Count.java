@@ -8,7 +8,7 @@ public class Count {
         value++;
     }
 
-    public int get() {
+    public synchronized int get() {
         return value;
     }
 
