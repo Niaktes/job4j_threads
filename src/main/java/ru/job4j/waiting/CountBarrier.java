@@ -13,11 +13,22 @@ public class CountBarrier {
     }
 
     public void count() {
-
+        synchronized (monitor) {
+            count++;
+            monitor.notifyAll();
+        }
     }
 
     public void await() {
-
+        synchronized (monitor) {
+            while (count < total) {
+                try {
+                    monitor.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
     }
 
 }
