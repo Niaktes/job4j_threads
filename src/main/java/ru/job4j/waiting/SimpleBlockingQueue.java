@@ -18,25 +18,17 @@ public class SimpleBlockingQueue<T> {
         this.maxElements = maxElements;
     }
 
-    public synchronized void offer(T value) {
+    public synchronized void offer(T value) throws InterruptedException {
         while (queue.size() >= maxElements) {
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            this.wait();
         }
         queue.add(value);
         this.notify();
     }
 
-    public synchronized T poll() {
+    public synchronized T poll() throws InterruptedException {
         while(queue.isEmpty()) {
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+           this.wait();
         }
         T element = queue.poll();
         this.notify();

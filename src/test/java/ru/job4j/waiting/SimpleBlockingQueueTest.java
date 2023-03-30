@@ -19,25 +19,49 @@ class SimpleBlockingQueueTest {
 
     @Test
     void whenAddAndPollThenGetValue() throws InterruptedException {
-        Thread producer = new Thread (() -> queue.offer(++nextElement));
-        Thread consumer = new Thread (() -> takenElement = queue.poll());
+        Thread producer = new Thread (() -> {
+            try {
+                queue.offer(++nextElement);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        });
+        Thread consumer = new Thread (() -> {
+            try {
+                takenElement = queue.poll();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        });
         producer.start();
         consumer.start();
         producer.join();
         consumer.join();
         assertEquals(1, takenElement);
-        producer.join();
-        consumer.join();
     }
 
     @Test
     void whenAddManyTimesThenProducerThreadWaiting() throws InterruptedException {
         Thread producer = new Thread (() -> {
-            for (int i = 0; i <= 3; i++) {
-                queue.offer(++nextElement);
+            try {
+                for (int i = 0; i <= 3; i++) {
+                    queue.offer(++nextElement);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         });
-        Thread consumer = new Thread (() -> takenElement = queue.poll());
+        Thread consumer = new Thread (() -> {
+            try {
+                takenElement = queue.poll();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        });
         producer.start();
         Thread.sleep(100);
         assertEquals(Thread.State.WAITING, producer.getState());
@@ -51,8 +75,22 @@ class SimpleBlockingQueueTest {
 
     @Test
     void whenPollFromEmptyThenConsumerThreadWaiting() throws InterruptedException {
-        Thread producer = new Thread (() -> queue.offer(++nextElement));
-        Thread consumer = new Thread (() -> takenElement = queue.poll());
+        Thread producer = new Thread (() -> {
+            try {
+                queue.offer(++nextElement);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        });
+        Thread consumer = new Thread (() -> {
+            try {
+                takenElement = queue.poll();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        });
         consumer.start();
         Thread.sleep(100);
         assertEquals(Thread.State.WAITING, consumer.getState());
@@ -62,7 +100,6 @@ class SimpleBlockingQueueTest {
         producer.join();
         consumer.join();
         assertEquals(Thread.State.TERMINATED, consumer.getState());
-
     }
 
 }
