@@ -18,6 +18,10 @@ public class SimpleBlockingQueue<T> {
         this.maxElements = maxElements;
     }
 
+    public boolean isEmpty() {
+        return queue.isEmpty();
+    }
+
     public synchronized void offer(T value) throws InterruptedException {
         while (queue.size() >= maxElements) {
             this.wait();
