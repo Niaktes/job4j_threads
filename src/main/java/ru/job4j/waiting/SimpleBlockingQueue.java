@@ -18,7 +18,7 @@ public class SimpleBlockingQueue<T> {
         this.maxElements = maxElements;
     }
 
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return queue.isEmpty();
     }
 
