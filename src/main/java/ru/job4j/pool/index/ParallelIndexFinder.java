@@ -1,17 +1,16 @@
 package ru.job4j.pool.index;
 
-import java.util.NoSuchElementException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
-public class ParallelIndexFinder extends RecursiveTask<Integer> {
+public class ParallelIndexFinder<T> extends RecursiveTask<Integer> {
 
-    private final Object[] array;
+    private final T[] array;
     private final int from;
     private final int to;
-    private final Object desired;
+    private final T desired;
 
-    ParallelIndexFinder(Object[] array, int from, int to, Object desired) {
+    public ParallelIndexFinder(T[] array, int from, int to, T desired) {
         this.array = array;
         this.from = from;
         this.to = to;
@@ -20,32 +19,32 @@ public class ParallelIndexFinder extends RecursiveTask<Integer> {
 
     @Override
     protected Integer compute() {
-        Integer index = null;
         if (to - from <= 10) {
-            for (int i = from; i <= to; i++) {
-                if (desired.getClass() != array[i].getClass()) {
-                    throw new IllegalArgumentException("Different types of data");
-                }
-                if (desired.equals(array[i])) {
-                    index = i;
-                }
-            }
-            return index;
+            return linearSearch();
         }
         int mid = (from + to) / 2;
-        ParallelIndexFinder leftFinder = new ParallelIndexFinder(array, from, mid, desired);
-        ParallelIndexFinder rightFinder = new ParallelIndexFinder(array, mid + 1, to, desired);
+        ParallelIndexFinder<T> leftFinder = new ParallelIndexFinder<>(array, from, mid, desired);
+        ParallelIndexFinder<T> rightFinder = new ParallelIndexFinder<>(array, mid + 1, to, desired);
         leftFinder.fork();
         rightFinder.fork();
-        index = leftFinder.join();
+        Integer index = leftFinder.join();
         return rightFinder.join() != null ? rightFinder.join() : index;
     }
 
-    public static Integer find(Object desired, Object[] array) {
+    public static <T> Integer find(T desired, T[] array) {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
-        Integer index = forkJoinPool.invoke(new ParallelIndexFinder(array, 0, array.length-1, desired));
-        if (index == null) {
-            throw new NoSuchElementException();
+        return forkJoinPool.invoke(new ParallelIndexFinder<>(array, 0, array.length-1, desired));
+    }
+
+    private Integer linearSearch() {
+        Integer index = null;
+        for (int i = from; i <= to; i++) {
+            if (desired.getClass() != array[i].getClass()) {
+                throw new IllegalArgumentException("Different types of data");
+            }
+            if (desired.equals(array[i])) {
+                index = i;
+            }
         }
         return index;
     }

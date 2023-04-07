@@ -2,8 +2,6 @@ package ru.job4j.pool.index;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.NoSuchElementException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParallelIndexFinderTest {
@@ -33,7 +31,7 @@ class ParallelIndexFinderTest {
     void whenNoElementInArrayThenGetNSEException() {
         Integer[] array = new Integer[] {5, 8, 11, 21, 4, 9, 3, 12, 81, 2, 44, 0, 99, 2, -15, 0, 57, 34, 8, 5, 4, 3, 2};
         Integer desired = 1;
-        assertThrows(NoSuchElementException.class, () -> ParallelIndexFinder.find(desired, array));
+        assertNull(ParallelIndexFinder.find(desired, array));
     }
 
 }
