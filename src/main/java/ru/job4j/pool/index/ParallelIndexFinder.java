@@ -27,23 +27,20 @@ public class ParallelIndexFinder<T> extends RecursiveTask<Integer> {
         ParallelIndexFinder<T> rightFinder = new ParallelIndexFinder<>(array, mid + 1, to, desired);
         leftFinder.fork();
         rightFinder.fork();
-        Integer index = leftFinder.join();
-        return rightFinder.join() != null ? rightFinder.join() : index;
+        return Math.max(leftFinder.join(), rightFinder.join());
     }
 
-    public static <T> Integer find(T desired, T[] array) {
+    public static <T> int find(T desired, T[] array) {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
         return forkJoinPool.invoke(new ParallelIndexFinder<>(array, 0, array.length-1, desired));
     }
 
-    private Integer linearSearch() {
-        Integer index = null;
+    private int linearSearch() {
+        int index = -1;
         for (int i = from; i <= to; i++) {
-            if (desired.getClass() != array[i].getClass()) {
-                throw new IllegalArgumentException("Different types of data");
-            }
             if (desired.equals(array[i])) {
                 index = i;
+                break;
             }
         }
         return index;

@@ -24,14 +24,14 @@ class ParallelIndexFinderTest {
     void whenArrayAndDesiredObjectDifferentTypesThenGetIAException() {
         String[] array = new String[] {"5", "8", "11", "21", "1", "9", "3"};
         Integer desired = 1;
-        assertThrows(IllegalArgumentException.class, () -> ParallelIndexFinder.find(desired, array));
+        assertEquals(-1, ParallelIndexFinder.find(desired, array));
     }
 
     @Test
     void whenNoElementInArrayThenGetNSEException() {
         Integer[] array = new Integer[] {5, 8, 11, 21, 4, 9, 3, 12, 81, 2, 44, 0, 99, 2, -15, 0, 57, 34, 8, 5, 4, 3, 2};
         Integer desired = 1;
-        assertNull(ParallelIndexFinder.find(desired, array));
+        assertEquals(-1, ParallelIndexFinder.find(desired, array));
     }
 
 }
