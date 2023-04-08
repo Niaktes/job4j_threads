@@ -3,9 +3,7 @@ package ru.job4j.async;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import ru.job4j.async.RolColSum.Sums;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class RolColSumTest {
 
@@ -22,24 +20,22 @@ class RolColSumTest {
 
     @Test
     void whenUseSumMethodThenGetRightSums() {
-        Sums[] sums = RolColSum.sum(matrix);
-        assertEquals(12, sums[0].getRowSum());
-        assertEquals(15, sums[1].getRowSum());
-        assertEquals(18, sums[2].getRowSum());
-        assertEquals(6, sums[0].getColSum());
-        assertEquals(15, sums[1].getColSum());
-        assertEquals(24, sums[2].getColSum());
+        Sums[] expected = new Sums[] {
+                new Sums(12, 6),
+                new Sums(15, 15),
+                new Sums(18, 24)
+        };
+        assertArrayEquals(expected, RolColSum.sum(matrix));
     }
 
     @Test
     void whenUseAsyncSumMethodThenGetRightSums() {
-        Sums[] sums = RolColSum.asyncSum(matrix);
-        assertEquals(12, sums[0].getRowSum());
-        assertEquals(15, sums[1].getRowSum());
-        assertEquals(18, sums[2].getRowSum());
-        assertEquals(6, sums[0].getColSum());
-        assertEquals(15, sums[1].getColSum());
-        assertEquals(24, sums[2].getColSum());
+        Sums[] expected = new Sums[] {
+                new Sums(12, 6),
+                new Sums(15, 15),
+                new Sums(18, 24)
+        };
+        assertArrayEquals(expected, RolColSum.asyncSum(matrix));
     }
 
 }
