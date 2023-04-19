@@ -6,3 +6,5 @@
 > Захаренко Сергей <br>
 email: Sergei.Rabota@gmail.com <br>
 Telegram: @Niaktes <br>
+
+в курсе произошла работа с ветками git
